@@ -15,8 +15,23 @@ function App() {
       .then((sushis) => setSushis(sushis));
   }, []);
 
-  function handleEatSushi(price) {
-    setBalance(balance - price);
+  function handleEatSushi(eatenSushi) {
+    if (balance >= eatenSushi.price) {
+      const updatedSushis = sushis.map((sushi) => {
+        if (sushi.id === eatenSushi.id) {
+          return { ...sushi, eaten: true };
+        } else {
+          return sushi;
+        }
+      });
+      setSushis(updatedSushis);
+      setBalance((oldBalance) => oldBalance - eatenSushi.price);
+    }
+  }
+  
+
+  function handleAddFunds(amount) {
+    setBalance(balance + amount);
   }
 
   return (
@@ -24,10 +39,10 @@ function App() {
       <SushiContainer
         sushis={sushis.slice(currentSushiIndex, currentSushiIndex + 4)}
         onEatSushi={handleEatSushi}
-        onMoreSushi={() => setCurrentSushiIndex(currentSushiIndex + 4)}
+        onMoreSushi={() => setCurrentSushiIndex((currentSushiIndex + 4) % sushis.length)}
         balance={balance}
       />
-      <Table plates={sushis.filter((sushi) => sushi.eaten)} balance={balance} />
+      <Table plates={sushis.filter((sushi) => sushi.eaten)} balance={balance} onAddFunds={handleAddFunds} />
     </div>
   );
 }
